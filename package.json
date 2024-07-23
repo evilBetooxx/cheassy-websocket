@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node src/index.ts"
+    "dev": "tsx watch src/index.ts"
   },
   "repository": {
     "type": "git",
@@ -26,17 +26,25 @@
     "@types/express-serve-static-core": "^4.19.5",
     "@types/http-errors": "^2.0.4",
     "@types/mqtt": "^2.5.0",
+    "@types/node": "^20.14.11",
     "@types/qs": "^6.9.15",
     "@types/send": "^0.17.4",
     "@types/serve-static": "^1.15.7",
     "@types/socket.io": "^3.0.2",
+    "@types/socket.io-client": "^1.4.36",
     "@types/ws": "^8.5.11",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "nodemon": "^3.1.4",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.4"
   },
   "dependencies": {
-    "mqtt": "^5.8.1"
+    "mongodb": "^6.8.0",
+    "mqtt": "^5.8.1",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5"
   }
 }

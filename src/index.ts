@@ -3,11 +3,11 @@ import { Server } from "socket.io";
 import dotenv from "dotenv";
 import cors from "cors";
 import mqtt from "mqtt";
+import { MongoClient } from "mongodb";
 
 dotenv.config();
 
 const app = express();
-
 const port = process.env.PORT || 3002;
 
 app.use(express.json());
@@ -29,31 +29,74 @@ const io: Server = new Server(server, {
   },
 });
 
+// Conexión a MongoDB
+const mongoUri =
+  "mongodb+srv://admin:admin123@cheassy.q9xcy9y.mongodb.net/cheassy?retryWrites=true&w=majority";
+const client = new MongoClient(mongoUri);
+
+async function connectToMongo() {
+  try {
+    await client.connect();
+    console.log("Conectado a MongoDB Atlas");
+  } catch (error) {
+    console.error("Error al conectar a MongoDB:", error);
+  }
+}
+
+connectToMongo();
+
 io.on("connection", (socket: any) => {
   console.log("Usuario Conectado con token:", socket.id);
 
-  const client = mqtt.connect("http://34.194.171.140", {
+  let currentCheeseId: string | null = null;
+
+  const mqttClient = mqtt.connect("http://34.194.171.140", {
     username: "guest",
-    password: "guest"
+    password: "guest",
   });
 
-  socket.on("startup", () => {
-    console.log("Suscrito a la incubadora: eggssellent");
-    client.subscribe("eggssellent");
+  socket.on("startup", (cheeseId: string) => {
+    console.log("Suscrito a la camara: Cheassy para el queso:", cheeseId);
+    currentCheeseId = cheeseId;
+    mqttClient.subscribe("mqtt");
   });
 
   socket.on("shutdown", () => {
-    console.log('Desconectado de la incubadora: eggssellent')
-    client.unsubscribe("eggssellent");
-  })
+    console.log("Desconectado de la camara: Cheassy");
+    mqttClient.unsubscribe("mqtt");
+    currentCheeseId = null;
+  });
 
-  client.on('message', (topic, payload) => {
-    // console.log('Mensaje recibido:', topic, payload.toString())
+  mqttClient.on("message", async (topic, payload) => {
+    console.log("Mensaje recibido:", topic, payload.toString());
+
+    // Enviar datos al frontend
     socket.emit("data", payload.toString());
-  })
+
+    // Guardar datos en MongoDB
+    if (currentCheeseId) {
+      try {
+        const database = client.db("cheassy");
+        const collection = database.collection("mensajes");
+        await collection.insertOne({
+          cheeseId: currentCheeseId,
+          topic: topic,
+          message: payload.toString(),
+          timestamp: new Date(),
+        });
+        console.log(
+          "Datos guardados en MongoDB para el queso:",
+          currentCheeseId
+        );
+      } catch (error) {
+        console.error("Error al guardar en MongoDB:", error);
+      }
+    }
+  });
 
   socket.on("disconnect", () => {
     console.log("Usuario Desconectado", socket.id);
-    client.unsubscribe("eggssellent");
+    mqttClient.unsubscribe("mqtt");
+    currentCheeseId = null;
   });
-}); 
+});
