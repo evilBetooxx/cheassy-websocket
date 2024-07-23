@@ -77,12 +77,10 @@ io.on("connection", (socket: any) => {
     if (currentCheeseId) {
       try {
         const database = client.db("cheassy");
-        const collection = database.collection("mensajes");
+        const collection = database.collection("Data");
         await collection.insertOne({
           cheeseId: currentCheeseId,
-          topic: topic,
-          message: payload.toString(),
-          timestamp: new Date(),
+          data: payload.toString(),
         });
         console.log(
           "Datos guardados en MongoDB para el queso:",
