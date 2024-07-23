@@ -76,7 +76,7 @@ io.on("connection", (socket: any) => {
     // Guardar datos en MongoDB
     if (currentCheeseId) {
       try {
-        const database = client.db("cheassy");
+        const database = client.db("cheassy");  
         const collection = database.collection("Data");
         await collection.insertOne({
           cheeseId: currentCheeseId,
