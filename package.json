@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "websocket de cheassy",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "start": "pm2 start build/index.js --attach",
+    "tsc": "tsc"
   },
   "repository": {
     "type": "git",
